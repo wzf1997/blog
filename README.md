@@ -6,6 +6,6 @@ JS 手写， 拒绝做 API 工程师
 
 目前已经实现：
 
-1.  bind
-2.  new
-3.  set
+1.  [bind](https://github.com/wzf1997/MyPolyfill/blob/main/es6/Mybind.js)
+2.  [new](https://github.com/wzf1997/MyPolyfill/blob/main/es6/Mynew.js)
+3.  [set](https://github.com/wzf1997/MyPolyfill/blob/main/es6/set.js)
