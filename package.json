@@ -1,0 +1,29 @@
+{
+  "name": "myp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "set.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.js": [
+      "eslint --fix --ext .js",
+      "git add"
+    ]
+  },
+  "devDependencies": {
+    "eslint": "^7.27.0",
+    "eslint-config-ali": "^12.1.0",
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0"
+  }
+}
