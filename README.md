@@ -3,7 +3,7 @@
 JS 手写， 拒绝做 API 工程师
 
 每周定时更新:
-![www](url)
+![www](https://github.com/wzf1997/MyPolyfill/blob/main/static/head.JPG)
 
 目前已经实现：
 
