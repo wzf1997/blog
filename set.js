@@ -30,7 +30,7 @@
             return this.data.length;
         }
 
-        [Symbol.iterator] () {
+        [Symbol.iterator]    () {
             return this.values();
         }
 
@@ -70,6 +70,7 @@
             return makeIterator(this.data, value => value);
         }
         values () {
+                
             return this.keys();
         }
 
@@ -77,7 +78,7 @@
             return makeIterator(this.data, value => [value, value]);
         }
     }
-    
+
     global.mySet = mySet;
 })()
  
