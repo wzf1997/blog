@@ -1,4 +1,4 @@
-# MyPolyfill
+# 大厂-前端复习之路
 
 JS 手写， 拒绝做 API 工程师
 
@@ -11,3 +11,4 @@ JS 手写， 拒绝做 API 工程师
 2.  [new](https://github.com/wzf1997/MyPolyfill/blob/main/es6/Mynew.js)
 3.  [set](https://github.com/wzf1997/MyPolyfill/blob/main/es6/set.js)
 4.  [svg](https://github.com/wzf1997/MyPolyfill/blob/main/svg/index.html)
+5.  [二叉树](https://github.com/wzf1997/MyPolyfill/blob/main/algorithms/tree）
