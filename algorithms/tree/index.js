@@ -17,6 +17,7 @@ class binaryTreeNode {
   setRight(node) {
     this.right = node
   }
+
   // 前序遍历
   static traverseInFront(node, total = []) {
     if (!node) {

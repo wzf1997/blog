@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script type="module" >
+        import Axios, {cancelToken} from './axios.js';
+        const config = { url:'http://101.132.113.6:3030/api/mock' }
+        const axios =  new Axios();
+        // 在axios 实例上挂载属性
+        const err = (err) => { console.log(err)}
+        // let  cancelFun = undefined;
+        // const cancelInstance = new cancelToken((c)=>{
+        //     cancelFun = c;
+        // });
+        // config.cancelToken = cancelInstance;
+        // setTimeout(()=>{
+        //     cancelFun('取消成功')
+        // },50)
+
+        const { token, cancel }  = cancelToken.source();
+        config.cancelToken = token;
+        setTimeout(()=>{
+            cancel()
+        },50)
+
+
+        axios.interceptors.request.use((config)=> {
+            console.log('我是请求拦截器1')
+            config.id = 1;
+            return  config
+        },err )
+        axios.interceptors.request.use((config)=> {
+            config.id = 2
+            console.log('我是请求拦截器2')
+            return config
+        },err)
+        axios.interceptors.response.use((data)=> {
+            console.log('我是响应拦截器1',data )
+            data += 1;
+            return data;
+        },err)
+        axios.interceptors.response.use((data)=> {
+            console.log('我是响应拦截器2',data )
+            return  data
+        },err)
+        axios.request(config).then(res => {
+            // console.log(res,'0000')
+            // return res;
+        }).catch(err => {
+            console.log(err)
+        })
+    </script>
+</body>
+</html>
