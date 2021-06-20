@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        p {
+            margin: 0 100px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="1800" height="800"></canvas>
+    <p>滚动滚轮调节光源高度</p>
+    <script >
+
+        class Vector3 {
+        constructor(x, y, z) {
+            this.x = x || 0
+            this.y = y || 0
+            this.z = z || 0
+        }
+
+        dot(vec) {
+            return this.x * vec.x + this.y * vec.y + this.z * vec.z
+        }
+        clone() {
+            return new this.constructor(this.x, this.y, this.z)
+        }
+        length() {
+            return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z)
+        }
+
+        multiplyScalar(scalar) {
+            this.x *= scalar
+            this.y *= scalar
+            this.z *= scalar
+            return this
+        }
+        sub(v) {
+            this.x -= v.x
+            this.y -= v.y
+            this.z -= v.z
+
+            return this
+        }
+
+        normalize() {
+            return this.multiplyScalar(1 / this.length())
+        }
+        negate() {
+            this.x = -this.x
+            this.y = -this.y
+            this.z = -this.z
+            return this
+        }
+        }
+        const canvas = document.getElementById( 'canvas' );
+        const ctx = canvas.getContext( '2d' );
+
+        const plane = {
+            center: new Vector3(250,250,0),    // 平面中心点坐标
+            width: 500,                 // 宽
+            height: 500,                // 高
+            normal: new Vector3(0,0,1),        // 朝向，即法向量
+            color: { r: 0, g: 255, b: 0 }   // 颜色为红色
+        }
+
+        const pointLight = {
+            position: new Vector3(250,250,60),
+            color: {
+                r: 255,
+                g: 255,
+                b: 255
+            }
+        }
+
+        const imageData = ctx.createImageData( plane.width, plane.height );
+        function render() {
+            for ( let x = 0; x < imageData.width; x++ ) {
+                for ( let y = 0; y < imageData.height; y++ ) {
+                    let index = y * imageData.width + x;
+
+                    let position = new Vector3(x,y,0);
+                    let normal = new Vector3(0,0,1);
+                  
+                    let currentToLight = pointLight.position.clone().sub(position).normalize();
+                    let light = currentToLight.dot(normal);
+
+                    imageData.data[ index * 4 ] = Math.min( 255, ( pointLight.color.r + plane.color.r ) * light );
+                    imageData.data[ index * 4 + 1 ] =  Math.min( 255, ( pointLight.color.g + plane.color.g ) * light );
+                    imageData.data[ index * 4 + 2 ] =  Math.min( 255, ( pointLight.color.b + plane.color.b ) * light );
+                    imageData.data[ index * 4 + 3 ] = 255;
+                }
+            }
+
+            ctx.putImageData( imageData, 100, 100 );
+
+        }
+
+
+        document.addEventListener( 'mousemove', function( e ) {
+            pointLight.position.x = e.clientX - 100
+            pointLight.position.y = e.clientY - 100
+
+            render()
+        }, false )
+
+        document.addEventListener( 'wheel', function( e ) {
+            pointLight.position.y += e.deltaY * 0.04;
+            render()
+        }, false )
+	    
+	render();
+
+
+    </script>
+</body>
+</html>

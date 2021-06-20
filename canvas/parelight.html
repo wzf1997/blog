@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+     html,
+            body {
+                padding: 0;
+                margin: 0;
+            }
+
+            .box {
+                width: 300px;
+                height: 200px;
+                position: absolute;
+                left: 500px;
+                top: 300px;
+                font-size: 13px;
+                font-weight: 600;
+                line-height: 40px;
+            }
+
+            #range {
+                display: inline-block;
+                width: 170px;
+                margin: 0 20px;
+            }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="1800" height="800"></canvas>
+    <div class="box">
+        <div>rotation<input type="range" id="range" min="-180" max="180"><span id="angle">0</span></div>
+    </div>
+    <script src="./light.js">
+
+        const plane = {
+            normal: new Vector3(0, 0, 1), // 朝向，即法向量
+            color: { r: 255, g: 0, b: 0 }, // 颜色为红色
+        }
+
+        const directionalLight = {
+            direction: new Vector3(0, 0, -1), // 从屏幕外垂直照向屏幕
+            color: { r: 255, g: 255, b: 255 }, // 颜色为纯白色
+        }
+        const reverseLightDirection = directionalLight.direction.clone().negate() // 计算平行光的反方向向量
+        const intensity = reverseLightDirection.dot(plane.normal) // 计算两向量点乘
+        // 计算有光照时的颜色
+        const color = {
+            r: intensity * plane.color.r + intensity * directionalLight.r,
+            g: intensity * plane.color.g + intensity * directionalLight.g,
+            b: intensity * plane.color.b + intensity * directionalLight.g,
+        }
+        // 实时获得角度
+        let angle = 60;
+        const input = document.getElementById('range');
+        input.addEventListener('input',(e)=> {
+            const value = e.target.value;
+            angle = value / 180 * Math.PI;
+            render();
+        });
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+       
+        function render() {
+            // 做一次清除
+            ctx.clearRect( 0, 0, 1200, 800 );
+
+            // draw arrow
+            const x = 100 / 2 * Math.sin( angle );
+            const y = 100 / 2 * Math.cos( angle );
+            const  offset = 50;
+            drawArrow(ctx,[x + 500, -y + 100], [-x + 500, y + 100])
+            drawArrow(ctx,[x + 500 + offset, -y + 100], [-x + 500 + offset, y + 100])
+
+            // react
+            ctx.beginPath();
+            ctx.rect(50,100,250,250);
+            const intensity = new Vector3(-x, 0, y).normalize().dot( new Vector3(0,0,1));
+            ctx.fillStyle = 'rgb(' + ( intensity * 255 >> 0 ) + ', 0, 0)';
+
+            ctx.fill();
+        }
+        render();
+       
+        function drawArrow( ctx, start, end ) {
+            // 箭头的张开的角度 和 长度
+            const theta = Math.PI / 6;
+            const d = 10;
+
+            // 这里计算的是 与x轴的角度
+            const angle = Math.atan2(start[ 1 ] - end[ 1 ], start[ 0 ] - end[ 0 ]);
+
+            ctx.beginPath();
+
+            ctx.moveTo( start[ 0 ], start[ 1 ] );
+            ctx.lineTo( end[ 0 ], end[ 1 ] );
+
+            ctx.moveTo(
+                end[ 0 ] + d * Math.cos( angle + theta ),
+                end[ 1 ] + d * Math.sin( angle + theta ) );
+
+            ctx.lineTo( end[ 0 ], end[ 1 ] );
+
+            ctx.lineTo(
+                end[ 0 ] + d * Math.cos( angle - theta ),
+                end[ 1 ] +  d * Math.sin( angle - theta ) );
+            ctx.stroke();
+
+        }
+    </script>
+</body>
+</html>

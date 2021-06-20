@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        margin-top: 10px;
+        margin-left: 181px;
+    }
+</style>
+<body>
+    <h1 >端午节快乐</h1>
+    <canvas id='canvas'  width="1000" height="1000" ></canvas>
+</body>
+<script >
+    const canvas = document.getElementById( 'canvas' );
+    const ctx = canvas.getContext( '2d' );
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000';
+    let percent = 0
+    let count = 80;
+    // 定义圆心
+    const center = [300, 300];
+    const radius = 300;
+    const colors = [];
+    getRandomColor(colors,count)
+    function animate() {
+        ctx.clearRect( 0, 0, 1000, 1000 );
+        for(let i=0; i<count; i++) {
+            const angle = Math.PI * 2 / count* i ;
+            console.log(count * i)
+            const x = center[ 0 ] + radius * Math.sin( angle );
+            const y = center[ 1 ] + radius * Math.cos( angle );
+            ctx.strokeStyle = colors[ i ];
+            ctx.beginPath();
+            drawWithDiscrete(ctx, center,[180,50],[x,y],percent)
+            ctx.stroke();
+        }
+        percent = ( percent + 1 ) % 100;
+        requestAnimationFrame(animate)
+    }
+    animate()
+
+        // 这个方程就是二次贝赛尔曲线方
+    function twoBezizer(p0, p1, p2, t) {
+        const k = 1 - t
+        return k * k * p0 + 2 * (1 - t) * t * p1 + t * t * p2
+    }
+
+    function oneBezizer(p0,p1,t) {
+        return p0 + (p1-p0) * t
+    }
+
+    function drawWithDiscrete2(ctx, start, control, end,percent) {
+        const t = percent/ 100;
+        // 求出A点
+        const A = [];
+        const C = [];
+        A[0] = oneBezizer(start[0],control[0],t);
+        A[1] = oneBezizer(start[1],control[1],t);
+        C[0] = twoBezizer(start[0], control[0], end[0], t)
+        C[1] = twoBezizer(start[1], control[1], end[1], t)
+        ctx.quadraticCurveTo( 
+            A[ 0 ], A [ 1 ],
+            C[ 0 ], C[ 1 ]
+        );
+    }
+    function drawWithDiscrete(ctx, start, control, end,percent) {
+        ctx.moveTo(start[0], start[1])
+        for ( let t = 0; t <= percent / 100; t += 0.01 ) {
+            const x = twoBezizer(start[0], control[0], end[0], t)
+            const y = twoBezizer(start[1], control[1], end[1], t)
+            ctx.lineTo(x, y)
+        }
+    }
+
+    function getRandomColor(colors, count) {
+		// 生成随机颜色
+        for ( let i = 0; i < count; i++ )  {
+            colors.push( 
+            	'rgb( ' + 
+            		( Math.random() * 255 >> 0 ) + ',' +
+            		( Math.random() * 255 >> 0 ) + ',' + 
+            		( Math.random() * 255 >> 0 ) + 
+            	' )'
+            );
+        }
+    }
+
+
+     
+</script>
+</html>
