@@ -14,3 +14,5 @@
 5.  [二叉树](https://github.com/wzf1997/MyPolyfill/tree/main/algorithms/tree)
 6.  [多种字体转 svg 方案实现](https://github.com/wzf1997/MyPolyfill/tree/main/svg-font)
 7.  [手写 axios 实现](https://github.com/wzf1997/MyPolyfill/myAxios/index.html)
+8.  [canvas 实现礼花 🎉 效果](https://github.com/wzf1997/MyPolyfill/canvas/index.html)
+9.  [canvas 实现光照 🎉 效果](https://github.com/wzf1997/MyPolyfill/canvas/pointlight.html)
