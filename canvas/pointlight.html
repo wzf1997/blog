@@ -81,11 +81,11 @@
         }
 
         const imageData = ctx.createImageData( plane.width, plane.height );
+        console.log(imageData, '999')
         function render() {
             for ( let x = 0; x < imageData.width; x++ ) {
                 for ( let y = 0; y < imageData.height; y++ ) {
                     let index = y * imageData.width + x;
-
                     let position = new Vector3(x,y,0);
                     let normal = new Vector3(0,0,1);
                   
@@ -97,8 +97,8 @@
                     imageData.data[ index * 4 + 2 ] =  Math.min( 255, ( pointLight.color.b + plane.color.b ) * light );
                     imageData.data[ index * 4 + 3 ] = 255;
                 }
-            }
-
+            }   
+            console.log(imageData, '7878')
             ctx.putImageData( imageData, 100, 100 );
 
         }

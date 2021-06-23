@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+      canvas {
+          background:aqua;
+      }
+      *{
+          margin: 0px;
+          padding: 0px;
+      }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="1800" height="800"></canvas>
+    <script>
+        class Point2d {
+            constructor(x,y) {
+                this.x = x || 0;
+                this.y = y || 0;
+            }
+            clone() {
+                return new Point2d(this.x, this.y);
+            }
+            add(v) {
+                this.x += v.x;
+                this.y += v.y
+                return this;
+            }
+            sub(v){
+                this.x -= v.x;
+                this.y -= v.y
+                return this;
+            }
+
+            random() {
+                this.x = Math.random() *1800;
+                this.y = Math.random() * 800;
+                return this
+            }
+        }
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let start 
+        let end 
+        let isSelect = false;
+        function clearRect() {
+            ctx.clearRect(0,0,1800,800)
+        }
+        function drawFourPolygon( point, width = 200, height = 200) {
+            if(!point) {
+                return 
+            }
+            ctx.strokeStyle = 'black'
+            ctx.setLineDash([]); 
+            ctx.beginPath();
+            const { x, y } = point;
+            const moveVec = end.clone().sub(start);
+            const rightTop = new Point2d(x+ width / 2, y - height/2).clone().add(moveVec)
+            const rightBottom = new Point2d(x+ width / 2, y + height/2).clone().add(moveVec)
+            ctx.moveTo(x- width /2, y - height/2)
+            ctx.lineTo(isSelect ? rightTop.x : x+ width / 2, isSelect ? rightTop.y : y - height/2)
+            ctx.lineTo(isSelect ? rightBottom.x : x+ width / 2, isSelect ? rightBottom.y : y + height/2) 
+            ctx.lineTo(x - width / 2, y + height/2 )
+            ctx.closePath()
+            ctx.stroke()
+        }
+        function drawDashLine(start, end) {
+            if (!start || !end) {
+                return
+            }
+            ctx.strokeStyle = 'red';
+            ctx.setLineDash( [5, 10] );
+            ctx.beginPath();  
+            ctx.moveTo( start.x, start.y );
+            ctx.lineTo( end.x, end.y );
+            ctx.closePath()
+            ctx.stroke();
+        }
+        let isMove =  true;
+        canvas.addEventListener('mousemove',(e)=>{
+            if(!isMove) {
+                return 
+            }
+            const x = e.clientX;
+            const y = e.clientY;
+            clearRect();
+            end = new Point2d(x,y);
+            drawDashLine(start,end);
+            drawFourPolygon(start)
+        })
+        canvas.addEventListener('click',(e)=> {
+            if (e.altKey) {
+                isMove = false;
+                return;
+            }
+            clearRect()
+            isMove = !isMove;
+            const x = e.clientX;
+            const y = e.clientY;
+            start  = new Point2d(x,y);
+            drawFourPolygon(start)
+            isSelect = true;
+        });
+    </script>
+
+</body>
+</html>
