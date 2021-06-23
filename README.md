@@ -16,3 +16,4 @@
 7.  [手写 axios 实现](https://github.com/wzf1997/MyPolyfill/myAxios/index.html)
 8.  [canvas 实现礼花 🎉 效果](https://github.com/wzf1997/MyPolyfill/canvas/index.html)
 9.  [canvas 实现光照 🎉 效果](https://github.com/wzf1997/MyPolyfill/canvas/pointlight.html)
+10. [canvas 实现点线面的移动](https://github.com/wzf1997/MyPolyfill/canvas/pointlight.html)
