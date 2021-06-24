@@ -1,9 +1,9 @@
 # 博客的所有 case
 
-做一个爱折腾的前端
+喜欢图形的前端工程师
 
-每周定时更新:
-![www](https://github.com/wzf1997/MyPolyfill/blob/main/static/head.JPG)
+公众号 前端图形 每周定时更新:
+![www](https://github.com/wzf1997/MyPolyfill/blob/main/static/gzh.jpg)
 
 目前已经实现：
 
