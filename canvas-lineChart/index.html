@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+      canvas {
+        background: white;
+      }
+      #tooltip {
+        position: absolute;
+        z-index: 2;
+        background: white;
+        padding: 10px;
+        border-radius: 2px;
+        visibility: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="tooltip"></div>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <script type="module">
+      import { Point2d, computeLine } from './index.js'
+      class lineChart {
+        constructor(data, type) {
+          this.get2d()
+          this.data = data || []
+          this.type = type || 'line '
+          this.pointSet = new Set()
+          this.distance = 2
+          this.axisData = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          this.yxisData = ['0', '50', '100', '150', '200', '250', '300']
+          this.realData = [150, 230, 224, 224, 135, 147, 260]
+          this.totalPoints = []
+          this.xPoints = []
+          this.yPoints = []
+          this.tolerance = 30
+          this.tooltip = document.getElementById('tooltip')
+        }
+
+        get2d() {
+          this.canvas = document.getElementById('canvas')
+          this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this))
+          this.ctx = canvas.getContext('2d')
+          this.width = canvas.width
+          this.height = canvas.height
+        }
+
+        onMouseMove(e) {
+          const x = e.offsetX
+          const find = this.xPoints.findIndex(
+            (item) => Math.abs(x - item) <= this.tolerance
+          )
+          if (find > -1) {
+            this.tooltip.textContent = `数据：${this.axisData[find]}_ ${this.yxisData[find]}`
+            this.tooltip.style.visibility = 'visible'
+            this.tooltip.style.left = e.clientX + 2 + 'px'
+            this.tooltip.style.top = e.clientY + 2 + 'px'
+            const start = new Point2d(this.xPoints[find], this.origin.y)
+            const end = new Point2d(this.xPoints[find], 0)
+
+            this.clearData()
+            this.drawDashLine(start, end)
+            // this.ctx.setLineDash([])
+            this.addxAxis()
+            this.addyAxis()
+            this.setStrokeColor('#5370C6')
+            this.generateLineChart()
+          } else {
+            this.tooltip.style.visibility = 'hidden'
+          }
+        }
+
+        clearData() {
+          this.ctx.clearRect(0, 0, 600, 600)
+          this.xPoints = []
+          this.yPoints = []
+        }
+
+        initDraw() {
+          //定义坐标轴相对于画布的内边距
+          this.paddingLeft = 30 // 至少大于绘制文字的宽度
+          this.paddingBottom = 30 // 至少大于绘制文字的高度
+          this.origin = new Point2d(
+            this.paddingLeft,
+            this.height - this.paddingBottom
+          )
+
+          this.addxAxis()
+          this.addyAxis()
+          this.setStrokeColor('#5370C6')
+          this.generateLineChart()
+        }
+
+        generateLineChart() {
+          let start = new Point2d(this.xPoints[0], this.yPoints[0])
+          this.totalPoints.push(start)
+          this.drawCircle(start)
+          // 生成折线图
+          this.xPoints.slice(1).forEach((x, index) => {
+            const end = new Point2d(x, this.yPoints[index + 1])
+            this.totalPoints.push(end)
+            this.drawCircle(end)
+            this.drawLine(start, end)
+            start = end
+          })
+        }
+
+        drawDashLine(start, end) {
+          if (!start || !end) {
+            return
+          }
+          this.ctx.save()
+          this.ctx.setLineDash([5, 10])
+          this.beginPath()
+          this.moveTo(start.x, start.y)
+          this.lineTo(end.x, end.y)
+          this.stroke()
+          this.ctx.restore()
+        }
+
+        addxAxis() {
+          // X轴结束的
+          this.XaxisEnd = this.origin
+            .clone()
+            .add(new Point2d(this.width - this.paddingLeft * 2, 0))
+          this.drawLine(this.origin, this.XaxisEnd)
+          this.drawLineWithDiscrete(
+            this.origin,
+            this.XaxisEnd,
+            this.axisData.length
+          )
+        }
+
+        addyAxis() {
+          const end = this.origin
+            .clone()
+            .sub(new Point2d(0, this.height - this.paddingBottom * 2))
+          const points = []
+          const length = this.origin.y - end.y
+          const division = length / 300
+          for (let i = 0; i < this.yxisData.length; i++) {
+            const point = new Point2d(end.x, this.origin.y - i * division * 50)
+            const realData = this.realData[i]
+            this.yPoints.push(this.origin.y - realData * division)
+            points.push({
+              point,
+              text: this.yxisData[i],
+            })
+          }
+          points.forEach((info) => {
+            const { text, point } = info
+            const end = point
+              .clone()
+              .add(new Point2d(this.width - this.paddingLeft * 2, 0))
+            this.setStrokeColor('#E0E6F1')
+            this.drawLine(point, end)
+            this.clearStrokeColor()
+            this.ctx.fillText(text, point.clone().x - 30, point.y + 4, 20)
+          })
+        }
+
+        closePath() {
+          this.ctx.closePath()
+        }
+
+        setFillColor(color) {
+          this.ctx.fillStyle = color
+        }
+
+        clearFillColor() {
+          this.ctx.fillStyle = 'black'
+        }
+
+        setStrokeColor(color) {
+          this.ctx.strokeStyle = color
+        }
+
+        clearStrokeColor() {
+          this.ctx.strokeStyle = 'black'
+        }
+
+        beginPath() {
+          this.ctx.beginPath()
+        }
+
+        lineTo(x, y) {
+          this.ctx.lineTo(x, y)
+        }
+
+        moveTo(x, y) {
+          this.ctx.moveTo(x, y)
+        }
+
+        fill() {
+          this.ctx.fill()
+        }
+
+        stroke() {
+          this.ctx.stroke()
+        }
+
+        drawLineWithDiscrete(start, end, n = 5) {
+          // 由于 x 轴上的 y 都是相同的
+          const points = []
+          const textPoints = []
+          const startX = start.x
+          const endX = end.x
+          points.push(start)
+          const segmentValue = (endX - startX) / n
+          for (let i = 0; i <= n - 1; i++) {
+            const textpoint = new Point2d(
+              startX + i * segmentValue + segmentValue / 2 - 10,
+              start.y + 20
+            )
+            textPoints.push({
+              point: textpoint,
+              text: this.axisData[i],
+            })
+            points.push(new Point2d(startX + i * segmentValue, start.y))
+          }
+          points.push(end)
+
+          // 生成线段
+          points.forEach((point) => {
+            this.drawLine(point, point.clone().add(new Point2d(0, 5)))
+          })
+          // 生成文字
+          this.clearFillColor()
+          textPoints.forEach((info) => {
+            const { text, point } = info
+            this.xPoints.push(point.x)
+            this.ctx.fillText(text, point.x, point.y, 20)
+          })
+        }
+
+        drawLineCircle(start, end, type) {
+          const flag = type === 'left'
+          const { x: startX, y: startY } = start
+          const { x: endX, y: endY } = end
+          const center = this.getOnePointOnLine(
+            start.clone(),
+            end.clone(),
+            flag ? startX - this.distance : endX + this.distance
+          )
+          cen
+          this.drawCircle(center)
+        }
+
+        drawText() {}
+
+        drawLine(start, end) {
+          const { x: startX, y: startY } = start
+          const { x: endX, y: endY } = end
+          this.beginPath()
+          this.moveTo(startX, startY)
+          this.lineTo(endX, endY)
+          this.stroke()
+          this.closePath()
+        }
+
+        drawLineWithCircle(start, end) {
+          this.drawLineCircle(start, end, 'left')
+          this.drawLine(start, end)
+          this.drawLineCircle(start, end, 'right')
+        }
+
+        getOnePointOnLine(start, end, t = 2) {
+          return computeLine(start, end, t)
+        }
+
+        drawCircle(center, radius = 4, color) {
+          const { x, y } = center
+          this.beginPath()
+          this.setFillColor(color)
+          this.ctx.arc(x, y, radius, 0, Math.PI * 2, true) // 绘制
+          this.ctx.fill()
+        }
+      }
+
+      new lineChart().initDraw()
+    </script>
+  </body>
+</html>
