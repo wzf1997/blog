@@ -54,7 +54,7 @@
         get2d() {
           this.canvas = document.getElementById('canvas')
           this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this))
-          this.ctx = canvas.getContext('2d')
+          this.ctx = this.canvas.getContext('2d')
           this.width = canvas.width
           this.height = canvas.height
         }

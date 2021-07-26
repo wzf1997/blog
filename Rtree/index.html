@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<head>
+  <title>R-tree select Demo</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body,
+    html {
+      padding: 0;
+      margin: 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h4>R-tree 搜索 案例 (1w Rectangles)</h4>
+    <canvas
+      id="map"
+      width="960"
+      height="600"
+      style="border: 1px dotted #aaa; background-color: black"
+    ></canvas>
+    <div id="result">搜索时间(ms):</div>
+  </div>
+  <script src="./rbush.js"></script>
+  <script>
+    class search {
+      constructor() {
+        this.canvas = document.getElementById('map')
+        this.ctx = this.canvas.getContext('2d')
+        this.res = document.querySelector('#result')
+        this.tree = new RBush()
+        this.memCanva()
+        this.id = 1
+        this.fillCanvas()
+        this.loadItems()
+        this.ctx.drawImage(this.memCanv, 0, 0)
+        this.bbox = {
+          minX: 40,
+          minY: 20,
+          maxX: 80,
+          maxY: 70,
+        }
+        this.canvas.addEventListener('mousemove', this.handler.bind(this))
+      }
+
+      clearRect() {
+        this.ctx.clearRect(0, 0, 960, 600)
+        this.ctx.drawImage(this.memCanv, 0, 0)
+      }
+
+      handler(e) {
+        this.clearRect()
+        const x = e.offsetX
+        const y = e.offsetY
+        this.bbox.minX = x - 20
+        this.bbox.maxX = x + 20
+        this.bbox.minY = y - 20
+        this.bbox.maxY = y + 20
+        const start = performance.now()
+        const res = this.tree.search(this.bbox)
+        this.ctx.fillStyle = this.pattern
+        this.ctx.strokeStyle = 'rgba(255,255,255,0.7)'
+        res.forEach((item) => {
+          this.drawRect(item)
+        })
+        this.ctx.fill()
+        this.res.innerHTML =
+          'Search Time (ms): ' + (performance.now() - start).toFixed(3)
+      }
+
+      drawRect(item) {
+        this.ctx.rect(
+          item.minX,
+          item.minY,
+          item.maxX - item.minX,
+          item.maxY - item.minY
+        )
+      }
+
+      fillCanvas() {
+        const img = new Image()
+        img.src =
+          'https://ztifly.oss-cn-hangzhou.aliyuncs.com/%E6%B2%B9%E7%94%BB.jpeg'
+        img.onload = () => {
+          this.pattern = this.ctx.createPattern(img, '')
+        }
+      }
+      randomRect() {
+        const rect = {}
+        rect.minX = parseInt(Math.random() * 960)
+        rect.maxX = rect.minX + parseInt(Math.random() * 30)
+        rect.minY = parseInt(Math.random() * 600)
+        rect.maxY = rect.minY + parseInt(Math.random() * 30)
+        rect.name = 'rect' + this.id
+        this.id += 1
+        return rect
+      }
+
+      loadItems(n = 100000) {
+        let items = []
+        for (let i = 0; i < n; i++) {
+          const item = this.randomRect()
+          items.push(item)
+          this.memCtx.rect(
+            item.minX,
+            item.minY,
+            item.maxX - item.minX,
+            item.maxY - item.minY
+          )
+        }
+        this.memCtx.stroke()
+        this.tree.load(items)
+      }
+
+      memCanva() {
+        this.memCanv = document.createElement('canvas')
+        this.memCanv.height = 600
+        this.memCanv.width = 960
+        this.memCtx = this.memCanv.getContext('2d')
+        this.memCtx.strokeStyle = 'rgba(255,255,255,0.7)'
+      }
+    }
+    new search()
+  </script>
+</body>

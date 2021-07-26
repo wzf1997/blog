@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+      canvas {
+        background: black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <script type="module">
+      import { Point2d } from './index.js'
+      class board {
+        constructor() {
+          this.canvas = document.getElementById('canvas')
+          this.canvas.addEventListener('mousemove', this.move.bind(this))
+          this.canvas.addEventListener('mousedown', this.down.bind(this))
+          this.canvas.addEventListener('mouseup', this.up.bind(this))
+          this.ctx = this.canvas.getContext('2d')
+          this.startP = null
+          this.endP = null
+          this.isDown = false
+          this.setLineStyle()
+          this.points = []
+        }
+
+        setLineStyle() {
+          this.ctx.strokeStyle = 'red'
+          this.ctx.lineWidth = 1
+          this.ctx.lineJoin = 'round'
+          this.ctx.lineCap = 'round'
+        }
+        move(e) {
+          if (!this.isDown) {
+            return
+          }
+          this.endP = this.getPot(e)
+          this.points.push(this.endP)
+          if (this.points.length >= 3) {
+            const [controlP, endP] = this.points.slice(-2)
+            const middle = this.getMid(controlP, endP)
+            this.drawCurve(controlP, middle)
+            this.startP = middle
+          }
+          //   this.drawLine()
+          //   this.startP = this.endP
+        }
+        down(e) {
+          this.isDown = true
+          this.startP = this.getPot(e)
+          this.points.push(this.endP)
+        }
+        getPot(e) {
+          return new Point2d(e.offsetX, e.offsetY)
+        }
+
+        drawLine() {
+          if (!this.startP || !this.endP) {
+            return
+          }
+          this.ctx.beginPath()
+          this.ctx.moveTo(this.startP.x, this.startP.y)
+          this.ctx.lineTo(this.endP.x, this.endP.y)
+          this.ctx.stroke()
+          this.ctx.closePath()
+        }
+
+        drawCurve(controlP, endP) {
+          this.ctx.beginPath()
+          this.ctx.moveTo(this.startP.x, this.startP.y)
+          this.ctx.quadraticCurveTo(controlP.x, controlP.y, endP.x, endP.y)
+          this.ctx.stroke()
+          this.ctx.closePath()
+        }
+        up(e) {
+          this.startP = null
+          this.endP = null
+          this.isDown = false
+          this.points = []
+        }
+
+        getMid(p1, p2) {
+          const x = (p1.x + p2.x) / 2
+          const y = (p1.y + p2.y) / 2
+          return new Point2d(x, y)
+        }
+      }
+      new board()
+    </script>
+  </body>
+</html>
