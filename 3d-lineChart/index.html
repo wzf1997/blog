@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      html body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      #tooltip {
+        position: absolute;
+        z-index: 2;
+        background: white;
+        padding: 10px;
+        border-radius: 2px;
+        visibility: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="../js/three.js"></script>
+    <script src="../js/OrbitControls.js"></script>
+    <script src="../js/d3-geo.v1.min.js"></script>
+    <canvas id="canvas" width="1000" height="1000"></canvas>
+    <div id="tooltip"></div>
+    <script>
+      class threeChart {
+        constructor() {
+          this.init()
+        }
+
+        init() {
+          // 第一步新建一个场景
+          this.scene = new THREE.Scene()
+          this.setCamera()
+          this.setRenderer()
+        }
+
+        // 新建透视相机
+        setCamera() {
+          // 第二参数就是 长度和宽度比 默认采用浏览器  返回以像素为单位的窗口的内部宽度和高度
+          this.camera = new THREE.PerspectiveCamera(
+            75,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+          )
+          this.camera.position.z = 5
+        }
+
+        // 设置渲染器
+        setRenderer() {
+          this.renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('canvas'),
+          })
+          this.renderer.setPixelRatio(window.devicePixelRatio)
+          // 设置画布的大小
+          this.renderer.setSize(window.innerWidth, window.innerHeight)
+        }
+
+        // 设置环境光
+        setLight() {
+          this.ambientLight = new THREE.AmbientLight(0xffffff) // 环境光
+          this.scene.add(ambientLight)
+        }
+      }
+
+      new threeChart()
+    </script>
+  </body>
+</html>
