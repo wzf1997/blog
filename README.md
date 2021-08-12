@@ -22,3 +22,4 @@
 13. [canvas 实现折线图](https://github.com/wzf1997/blog/blob/main/canvas-lineChart/index.html)
 14. [Rbush-空间几何算法实现](https://github.com/wzf1997/blog/blob/main/Rtree/index.html)
 15. [canvas 实现连续平滑曲线](https://github.com/wzf1997/blog/blob/main/canvas-bezierLine/index.html)
+16. [canvas 实现奥运金牌🏅数据可视化](https://github.com/wzf1997/blog/tree/main/canvas-aoyun)
