@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      html body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      canvas {
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+      let aoyunDatas = []
+      class aoyunChart {
+        constructor() {
+          this.data = []
+          this.getData()
+          this.get2d()
+          this.initChart()
+          this.drawLineLabelMarkers()
+        }
+
+        setCanvasStyle(fillStyle = '#000', strokeStyle = '#000') {
+          this.ctx.font = '12px Arial'
+          this.ctx.lineWidth = 1
+          this.ctx.fillStyle = fillStyle
+          this.ctx.strokeStyle = strokeStyle
+        }
+
+        initChart() {
+          // 留一个内边距
+          this.padding = 60
+          // 算出图标实际的宽度和高度
+          this.cHeight = this.height - this.padding * 2
+          this.cWidth = this.width - this.padding * 2
+          // 计算出原点
+          this.originX = this.padding
+          this.originY = this.padding + this.cHeight
+          // 定义矩形的宽度
+          this.rectWidth = 30
+          // 定义Y轴的分段数
+          this.ySegments = 6
+          //定义字体最大宽度
+          this.fontMaxWidth = 40
+          //存放一个所有Ypoints
+          this.yPoints = []
+          // 定义鼠标移动的点
+          this.movePoint = undefined
+          // 定义动画的元素
+          // 运动相关
+          this.ctr = 1
+          this.numctr = 100
+        }
+
+        // 画线的方法
+        drawLine(x, y, X, Y) {
+          this.ctx.beginPath()
+          this.ctx.moveTo(x, y)
+          this.ctx.lineTo(X, Y)
+          this.ctx.stroke()
+          this.ctx.closePath()
+        }
+
+        drawLineLabelMarkers() {
+          //设置canvas 样式
+          this.setCanvasStyle()
+          this.ctx.translate(0.5, 0.5)
+          // 画x轴
+          this.drawLine(
+            this.originX,
+            this.originY,
+            this.originX,
+            this.originY - this.cHeight
+          )
+          // 画Y轴
+          this.drawLine(
+            this.originX,
+            this.originY,
+            this.originX + this.cWidth,
+            this.originY
+          )
+          //画X标尺
+          this.drawXlabel()
+          // 画Y轴标尺
+          this.drawYlabel()
+          // 画矩形
+          this.drawBars()
+          this.ctx.translate(-0.5, -0.5)
+        }
+
+        drawXlabel() {
+          const length = this.data.slice(0, 10).length
+          this.ctx.textAlign = 'center'
+          for (let i = 0; i < length; i++) {
+            const { country } = this.data[i]
+            const totalWidth = this.cWidth - 20
+            const xMarker = parseInt(
+              this.originX + totalWidth * (i / length) + this.rectWidth
+            )
+            const yMarker = this.originY + 15
+            this.ctx.fillText(country, xMarker, yMarker, this.fontMaxWidth) // 文字
+          }
+        }
+
+        drawYlabel() {
+          Z
+          const { jin: maxValue } = this.data[0]
+          this.maxVlaue = maxValue
+          this.ctx.textAlign = 'right'
+          this.ctx.strokeStyle = '#e0e0e0'
+          this.yPoints.push(this.originY)
+          for (let i = 1; i <= this.ySegments; i++) {
+            const markerVal = parseInt(maxValue * (i / this.ySegments))
+            const xMarker = this.originX - 5
+            const yMarker =
+              parseInt((this.cHeight * (this.ySegments - i)) / this.ySegments) +
+              this.padding +
+              20
+            this.ctx.fillText(markerVal, xMarker, yMarker) // 文字
+            this.drawLine(
+              this.originX,
+              yMarker - 4,
+              this.originX + this.cWidth,
+              yMarker - 4
+            )
+            this.yPoints.push(yMarker - 4)
+          }
+        }
+
+        //绘制方块
+        drawRect(x, y, width, height) {
+          this.ctx.save()
+          this.ctx.beginPath()
+
+          const gradient = this.getGradient()
+          this.ctx.fillStyle = gradient
+          this.ctx.strokeStyle = gradient
+          this.ctx.rect(x, y, width, height)
+          this.ctx.fill()
+          this.ctx.closePath()
+          this.ctx.restore()
+        }
+
+        getGradient() {
+          const gradient = this.ctx.createLinearGradient(0, 0, 0, 300)
+          gradient.addColorStop(0, 'red')
+          gradient.addColorStop(1, 'rgba(67,203,36,1)')
+          return gradient
+        }
+
+        drawBars() {
+          const length = this.data.slice(0, 10).length
+          const { jin: max } = this.data[0]
+          const diff = this.yPoints[0] - this.yPoints[this.yPoints.length - 1]
+          const dis = this.ctr / this.numctr
+          for (let i = 0; i < length; i++) {
+            const { jin: count } = this.data[i]
+            const barH = (count / max) * diff * dis
+            const y = this.originY - barH
+            const totalWidth = this.cWidth - 20
+            const x = parseInt(
+              this.originX + totalWidth * (i / length) + this.rectWidth / 2
+            )
+            this.drawRect(x, y, this.rectWidth, barH)
+            this.ctx.save()
+            this.ctx.textAlign = 'center'
+            this.ctx.fillText(
+              parseInt(count * dis),
+              x + this.rectWidth / 2,
+              y - 5
+            )
+            this.ctx.restore()
+          }
+          if (this.ctr < this.numctr) {
+            this.ctr++
+            requestAnimationFrame(() => {
+              this.ctx.clearRect(0, 0, this.width, this.height)
+              this.drawLineLabelMarkers()
+            })
+          }
+        }
+
+        getData() {
+          let curTime = Date.now()
+          if (localStorage.getItem('aoyun')) {
+            let { list, time } = JSON.parse(localStorage.getItem('aoyun'))
+            if (curTime - time <= 24 * 60 * 60 * 60) {
+              this.data = list
+            } else {
+              this.fetchData()
+            }
+          } else {
+            this.fetchData()
+          }
+        }
+
+        fetchData() {
+          fetch('http://localhost:3030/data')
+            .then((res) => res.json())
+            .then((res) => {
+              const { errcode, list } = JSON.parse(res.body)
+              if (errcode === 100) {
+                alert('接口请求太频繁')
+              } else if (errcode === 0) {
+                this.data = list
+                const obj = {
+                  list,
+                  time: Date.now(),
+                }
+                localStorage.setItem('aoyun', JSON.stringify(obj))
+              }
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+        }
+
+        get2d() {
+          this.canvas = document.getElementById('canvas')
+          this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this))
+          this.ctx = this.canvas.getContext('2d')
+          this.width = canvas.width
+          this.height = canvas.height
+        }
+
+        onMouseMove(e) {
+          //   this.ctx.clearRect(0, 0, this.width, this.height)
+          //   this.getData()
+          //   this.get2d()
+          //   this.initChart()
+          //   this.movePoint = e
+          //   this.drawLineLabelMarkers()
+        }
+      }
+      new aoyunChart()
+    </script>
+  </body>
+</html>
