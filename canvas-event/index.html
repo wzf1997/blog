@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      html body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      canvas {
+        background: red;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script type="module">
+      import { Canvas, Circle, Rect, move, click, Polygon } from './index.js'
+      import { Point2d } from '../canvas-bezierLine/index.js'
+      const canvas = new Canvas()
+      const circle = new Circle({
+        center: new Point2d(50, 50),
+        radius: 50,
+        fillColor: 'green',
+      })
+      const rect = new Rect({
+        leftTop: new Point2d(50, 50),
+        width: 100,
+        height: 100,
+        fillColor: 'black',
+      })
+      circle.on(click, (event) => {
+        event.isStopBubble = true
+        console.log(event, 'circle')
+      })
+      rect.on(click, (event) => {
+        console.log(event, 'rect')
+      })
+      const points = []
+      for (let i = 0; i < 5; i++) {
+        points.push(Point2d.random(800, 600))
+      }
+      const shape = new Polygon({
+        points,
+        fillColor: 'orange',
+      })
+      shape.on(click, (event) => {
+        console.log(event, 'polygon')
+      })
+      canvas.add(circle)
+      canvas.add(rect)
+      canvas.add(shape)
+    </script>
+  </body>
+</html>

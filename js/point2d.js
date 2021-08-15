@@ -1,10 +1,7 @@
-let current = 0
-const pointMap = []
 export class Point2d {
   constructor(x, y) {
     this.x = x || 0
     this.y = y || 0
-    this.id = ++current
   }
   clone() {
     return new Point2d(this.x, this.y)
@@ -39,12 +36,6 @@ export class Point2d {
     return this
   }
 
-  multiplyScalar(scalar) {
-    this.x *= scalar
-    this.y *= scalar
-    return this
-  }
-
   equal(v) {
     return this.x === v.x && this.y === v.y
   }
@@ -76,21 +67,4 @@ export class Point2d {
   cross(v) {
     return this.x * v.y - this.y * v.x
   }
-}
-
-export function computeLine(p0, p1, t) {
-  let x1 = p0.x
-  let y1 = p0.y
-  let x2 = p1.x
-  let y2 = p1.y
-  // 说明直线平行 y轴
-  if (x1 === x2) {
-    return new Point2d(x1, t)
-  }
-  // 平行X轴的情况
-  if (y1 === y2) {
-    return new Point2d(t, y1)
-  }
-  const y = ((t - x1) / (x2 - x1)) * (y2 - y1) + y1
-  return new Point2d(t, y)
 }

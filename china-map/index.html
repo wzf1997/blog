@@ -64,7 +64,6 @@
           const projection = d3
             .geoMercator()
             .center([104.0, 37.5])
-            .scale(80)
             .translate([0, 0])
 
           jsondata.features.forEach((elem) => {
@@ -218,7 +217,7 @@
           // 显示省份的信息
           if (this.lastPick) {
             const properties = this.lastPick.object.parent.properties
-            
+
             this.tooltip.textContent = properties.name
 
             this.tooltip.style.visibility = 'visible'
