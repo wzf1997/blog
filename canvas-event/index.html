@@ -18,11 +18,14 @@
       }
       canvas {
         background: red;
+        outline: 0px;
       }
     </style>
   </head>
   <body>
-    <canvas id="canvas" width="800" height="600"></canvas>
+    <canvas id="canvas" width="800" height="600" tabindex="0"></canvas>
+    <button id="btn">局部渲染</button>
+    <button id="btn2">全部渲染</button>
     <script type="module">
       import { Canvas, Circle, Rect, move, click, Polygon } from './index.js'
       import { Point2d } from '../canvas-bezierLine/index.js'
@@ -45,20 +48,48 @@
       rect.on(click, (event) => {
         console.log(event, 'rect')
       })
-      const points = []
-      for (let i = 0; i < 5; i++) {
-        points.push(Point2d.random(800, 600))
+      //   shape.on(click, (event) => {
+      //     console.log(event, 'polygon')
+      //   })
+      const shapes = []
+      for (let i = 1; i <= 50; i++) {
+        const circle = new Circle({
+          center: Point2d.random(800, 600),
+          radius: i + 20,
+          fillColor:
+            'rgb( ' +
+            ((Math.random() * 255) >> 0) +
+            ',' +
+            ((Math.random() * 255) >> 0) +
+            ',' +
+            ((Math.random() * 255) >> 0) +
+            ' )',
+        })
+        shapes.push(circle)
       }
-      const shape = new Polygon({
-        points,
-        fillColor: 'orange',
-      })
-      shape.on(click, (event) => {
-        console.log(event, 'polygon')
-      })
       canvas.add(circle)
-      canvas.add(rect)
-      canvas.add(shape)
+      console.log(shapes, '查看数据')
+      //canvas.batchAdd([rect, shape])
+      canvas.batchAdd(shapes)
+
+      // 局部改变圆的颜色
+      document.getElementById('btn').addEventListener(click, () => {
+        console.time('局部')
+        circle.change(
+          {
+            fillColor: 'blue',
+          },
+          canvas
+        )
+        console.timeEnd('局部')
+      })
+
+      // 全部刷新 改变圆的颜色
+      document.getElementById('btn2').addEventListener(click, () => {
+        console.time('全部')
+        canvas.reDraw2()
+        console.timeEnd('全部')
+      })
     </script>
   </body>
 </html>

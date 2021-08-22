@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="../js/three.js"></script>
+    <script src="../js/OrbitControls.js"></script>
+    <script src="../js/d3-geo.v1.min.js"></script>
+    <canvas id="canvas" width="1000" height="1000"></canvas>
+    <script>
+      class chinaMap {
+        constructor() {
+          this.init()
+        }
+
+        init() {
+          // 第一步新建一个场景
+          this.scene = new THREE.Scene()
+          // 雾
+          this.scene.fog = new THREE.Fog(0x05050c, 10, 60)
+          this.activeInstersect = []
+          this.setRenderer()
+          this.setCamera()
+          this.setController()
+          this.setRaycaster()
+          this.animate()
+          this.addHelper()
+        }
+
+        setController() {
+          this.controller = new THREE.OrbitControls(
+            this.camera,
+            document.getElementById('canvas')
+          )
+        }
+
+        addCube() {
+          const geometry = new THREE.BoxGeometry()
+          const material = new THREE.MeshBasicMaterial({ color: 0x50ff22 })
+          this.cube = new THREE.Mesh(geometry, material)
+          this.scene.add(this.cube)
+        }
+
+        addHelper() {
+          const helper = new THREE.CameraHelper(this.camera)
+          this.scene.add(helper)
+        }
+
+        // 新建透视相机
+        setCamera() {
+          // 第二参数就是 长度和宽度比 默认采用浏览器  返回以像素为单位的窗口的内部宽度和高度
+          this.camera = new THREE.PerspectiveCamera(
+            75,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+          )
+          this.camera.position.set(0, 0, 120)
+          this.camera.lookAt(this.scene.position)
+        }
+        setRaycaster() {
+          this.raycaster = new THREE.Raycaster()
+          this.mouse = new THREE.Vector2()
+          this.tooltip = document.getElementById('tooltip')
+          const onMouseMove = (event) => {
+            this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+            this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+            this.tooltip.style.left = event.clientX + 2 + 'px'
+            this.tooltip.style.top = event.clientY + 2 + 'px'
+          }
+
+          window.addEventListener('mousemove', onMouseMove, false)
+        }
+
+        // 设置渲染器
+        setRenderer() {
+          this.renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('canvas'),
+          })
+          this.renderer.setPixelRatio(window.devicePixelRatio)
+          // 设置画布的大小
+          this.renderer.setSize(window.innerWidth, window.innerHeight)
+        }
+
+        // 设置环境光
+        setLight() {
+          // 环境光
+          let ambientLight = new THREE.AmbientLight(0x000000, 0.4)
+          this.scene.add(ambientLight)
+          let pointLight = new THREE.PointLight(0xe42107)
+          pointLight.castShadow = true
+          pointLight.position.set(-10, -5, -10)
+          pointLight.distance = 20
+          this.scene.add(pointLight)
+          this.scene.add(ambientLight)
+        }
+
+        render() {
+          this.renderer.render(this.scene, this.camera)
+        }
+
+        animate() {
+          requestAnimationFrame(this.animate.bind(this))
+          // 通过摄像机和鼠标位置更新射线
+          this.raycaster.setFromCamera(this.mouse, this.camera)
+          // 算出射线 与当场景相交的对象有那些
+          const intersects = this.raycaster.intersectObjects(
+            this.scene.children,
+            true
+          )
+          // 恢复上一次清空的
+          if (this.lastPick) {
+            this.lastPick.object.material[0].color.set('#2defff')
+            this.lastPick.object.material[1].color.set('#3480C4')
+          }
+          this.lastPick = null
+          this.lastPick = intersects.find(
+            (item) => item.object.material && item.object.material.length === 2
+          )
+          if (this.lastPick) {
+            this.lastPick.object.material[0].color.set(0xff0000)
+            this.lastPick.object.material[1].color.set(0xff0000)
+          }
+          this.render()
+        }
+      }
+      new chinaMap().init()
+    </script>
+  </body>
+</html>

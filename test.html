@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="WIDTH=device-WIDTH, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/build/three.js"></script>
+    <script src="https://unpkg.com/three@0.85.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.85.0/examples/js/libs/stats.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+  </head>
+
+  <body></body>
+</html>
+<script>
+  let initGraphData = {
+    idPoint: {},
+
+    init(len) {
+      let data = { nodes: [], links: [] }
+      for (let i = 0; i < len; i++) {
+        data.nodes.push({ id: i })
+        data.links.push({
+          source: Math.ceil(Math.random(len)),
+          target: i,
+          value: 1,
+          id: this.getId(),
+        })
+      }
+      return data
+    },
+
+    random(min, max) {
+      if (min > max) {
+        ;[min, max] = [max, min]
+      }
+      return parseInt(Math.random() * (max - min + 1) + min)
+    },
+
+    getId() {
+      let id = Date.now() + Math.ceil(Math.random(200))
+      while (this.idPoint[id]) {
+        id = Date.now() + Math.ceil(Math.random(200))
+      }
+      this.idPoint[id] = id
+      return id
+    },
+  }
+</script>
+
+<script>
+  //引力布局
+  async function initTransform() {
+    const simulation = d3
+      .forceSimulation(data.nodes)
+      .force(
+        'link',
+        d3
+          .forceLink(data.links)
+          .id((d) => d.id)
+          .distance(100)
+      )
+      .force('charge', d3.forceManyBody().strength(-1520))
+      .force('xAxis', d3.forceX(WIDTH / 2).strength(0.3))
+      .force('yAxis', d3.forceY(HEIGHT / 2).strength(0.7))
+      .force('center', d3.forceCenter(100, 100))
+
+    const promise = new Promise(function (resolve, reject) {
+      simulation.on('tick', () => {
+        if (simulation.alpha() <= 1) {
+          simulation.stop()
+
+          data.nodes.forEach((item) => {
+            item.x = Math.abs(item.x)
+            item.y = Math.abs(item.y)
+          })
+
+          data.links.forEach((item) => {
+            item.source.x = Math.abs(item.source.x)
+            item.source.y = Math.abs(item.source.y)
+            item.target.x = Math.abs(item.target.x)
+            item.target.y = Math.abs(item.target.y)
+          })
+          resolve('success')
+        }
+      })
+    })
+    return promise
+  }
+</script>
+
+<script>
+  const IMG_BASE641 =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAiCAIAAACx0EyoAAAACXBIWXMAAAsTAAALEwEAmpwYAAAGaGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDUgNzkuMTYzNDk5LCAyMDE4LzA4LzEzLTE2OjQwOjIyICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjAtMTItMDNUMTQ6MTg6NTYrMDg6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDIwLTEyLTAzVDE0OjE5OjM0KzA4OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIwLTEyLTAzVDE0OjE5OjM0KzA4OjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyIgcGhvdG9zaG9wOklDQ1Byb2ZpbGU9InNSR0IgSUVDNjE5NjYtMi4xIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjIyMzlmYWQ5LTc2MTQtNDgxMS1iMTdjLTc5NTM4ZTJkYjIxZCIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjIzZTc3YmVmLTRkY2EtNWQ0Yy1iOTQyLWZlMDAzZWMyODVhNCIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjE5ZTE1NmY5LTg4YjAtNGFmMy04ZmEyLWZlYmY4NmZmZGY1OCI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MTllMTU2ZjktODhiMC00YWYzLThmYTItZmViZjg2ZmZkZjU4IiBzdEV2dDp3aGVuPSIyMDIwLTEyLTAzVDE0OjE4OjU2KzA4OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoTWFjaW50b3NoKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY29udmVydGVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJmcm9tIGFwcGxpY2F0aW9uL3ZuZC5hZG9iZS5waG90b3Nob3AgdG8gaW1hZ2UvcG5nIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDoyMjM5ZmFkOS03NjE0LTQ4MTEtYjE3Yy03OTUzOGUyZGIyMWQiIHN0RXZ0OndoZW49IjIwMjAtMTItMDNUMTQ6MTk6MzQrMDg6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChNYWNpbnRvc2gpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PjD4GuYAAAH0SURBVEiJ3VbLkuQgDJOB/P/f9qGDzR40rfEQ0o9UzdbWckgp5mkLy9gYA0BEACilAHB3ALVWAGMMd2+tEUcE7RHh7tu2AQDQe9eYfd+3bTMzALfbreCXW+u9Lz2gZ/SAQ+mBPI4IHpMeaIy7mxm73L1xUU5b4jEGcUSUUojZJWxmwtyAv6WUpo6XG5iZuy830MY01lrpgZn9Ogf/HsnEE8mMO5Yk8/7mDdinPDCzszyg/eukjzFjjNaaFvksRHTrfTuAplDkr5nlOccxOuxxj8ne9n3HzxBlzLDQwpnC4gZA712L0k4aeu+NenJBi8xMWiSeOExa1MTG2Vdn0WHVu7QzvLnrM5Lziu/YcVnsdN/Z9UzsGFP+Z10SB/iZE8JjDGL+CpMn5cFFDhTrM/tFDi60xuhLZPAIy/LuC8ejacqE5VAjh1piwseZxFxd/GfCM8kR8VmiCU9FHwAxvVSi7fv+HxScM7FTuN1dQpYTLd+LLHzigzV8wcGkpk8KzlLsAOSC821Ve1I9XhacqRjg7xX9nAE5D3CIr06a735ESO+UH2YWES3f/ePDizl5fNllO6fnuUjvhxcvu6yyPNHyZVdrPXvZLUh+Uj3eadP0Lw6yPExSMWmR2DorOMTfBed+vyssuZaJzyxqKnB5Mw4+JiYT7Q/UrO0Jmi1AfwAAAABJRU5ErkJggg=='
+  const IMG_BASE64 =
+    'data:image/png;base64,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'
+  const WIDTH = window.innerWidth //窗口宽度
+  const HEIGHT = window.innerHeight //窗口高度
+
+  let data = JSON.parse(JSON.stringify(initGraphData.init(800)))
+  /**
+   * 创建场景对象Scene
+   */
+  let scene = new THREE.Scene()
+  //创建相机对象
+  let k = WIDTH / HEIGHT //窗口宽高比
+  let s = 1000 //三维场景显示范围控制系数，系数越大，显示的范围越大
+  let camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 100000)
+  camera.position.set(0, 0, 360) //设置相机位置
+  camera.lookAt(new THREE.Vector3(0, 0, 0)) //设置相机方向(指向的场景对象)
+
+  /**
+   * 创建渲染器对象
+   */
+  let renderer = new THREE.WebGLRenderer()
+  renderer.setSize(WIDTH, HEIGHT) //设置渲染区域尺寸
+  renderer.setClearColor(0xb9d3ff, 1) //设置背景颜色
+  document.body.appendChild(renderer.domElement) //body元素中插入canvas对象
+
+  let textureLoader = new THREE.TextureLoader() //加载纹理贴图
+  let texture
+  ;(async function graphInit() {
+    await initTransform()
+    let nodeMap = new Map()
+
+    let xArray = []
+    yArray = []
+    data.nodes.forEach((item) => {
+      nodeMap.set(item.id, item)
+    })
+
+    maxX = Math.max.apply(null, xArray)
+    maxY = Math.max.apply(null, yArray)
+    textureLoader.load(IMG_BASE64, function (d) {
+      texture = d
+      texture.needsUpdate = true
+      // texture.repeat.set(0, 0 );
+      data.links.forEach((item) => {
+        const start = nodeMap.get(item.source.id)
+        const end = nodeMap.get(item.target.id)
+        drawEdge(start, end)
+      })
+      data.nodes.forEach((item) => {
+        xArray.push(item.x)
+        yArray.push(item.y)
+        drawNode(item.x, item.y)
+      })
+
+      render()
+    })
+
+    var helper = new THREE.GridHelper(1000, 50)
+    // helper.setColors( 0x0000ff, 0x808080 );
+    scene.add(helper)
+  })()
+
+  function drawEdge(start, end) {
+    let geometry = new THREE.Geometry() //声明一个几何体对象Geometry
+    let p1 = new THREE.Vector2(start.x, start.y) //顶点1坐标
+    let p2 = new THREE.Vector2(end.x, end.y) //顶点2坐标
+
+    let LineCurve = new THREE.LineCurve(p1, p2)
+    let pointArr = LineCurve.getPoints(1000)
+    geometry.setFromPoints(pointArr)
+
+    let material = new THREE.PointsMaterial({
+      color: 0xffff00,
+    })
+
+    let line = new THREE.Line(geometry, material)
+    scene.add(line)
+  }
+
+  function drawNode(x, y) {
+    let shape = new THREE.Shape()
+    shape.arc(x, y, 10, 0, 2 * Math.PI)
+
+    let geometry = new THREE.ShapeGeometry([shape], 0)
+
+    console.log(texture, 'texture')
+    let material = new THREE.MeshBasicMaterial({
+      map: texture, //给纹理属性map赋值
+      color: 0xffffff,
+      side: DoubleSide,
+      //   transparent: true,
+    })
+
+    let mesh = new THREE.Mesh(geometry, material) //网格模型对象Mesh
+    scene.add(mesh) //网格模型添加到场景中
+  }
+
+  function render() {
+    renderer.render(scene, camera) //执行渲染操作
+  }
+  let controls = new THREE.OrbitControls(camera, renderer.domElement) //创建控件对象
+  controls.addEventListener('change', render) //监听鼠标、键盘事件
+</script>

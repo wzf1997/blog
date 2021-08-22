@@ -38,6 +38,17 @@ export class Point2d {
     this.y -= v.y
     return this
   }
+  min(v) {
+    this.x = Math.min(this.x, v.x)
+    this.y = Math.min(this.y, v.y)
+    return this
+  }
+
+  max(v) {
+    this.x = Math.max(this.x, v.x)
+    this.y = Math.max(this.y, v.y)
+    return this
+  }
 
   multiplyScalar(scalar) {
     this.x *= scalar
