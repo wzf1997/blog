@@ -4,7 +4,8 @@
 
 公众号 前端图形 每周定时更新:
 
-<img src="https://ztifly.oss-cn-hangzhou.aliyuncs.com/image-20210905173945402.png" alt="公众号" style="zoom:50%;" />
+<img src="https://ztifly.oss-cn-hangzhou.aliyuncs.com/image-20210905173945402.png" width="50%" height = "50%"
+alt="公众号" style="zoom:50%;" />
 
 # js
 
