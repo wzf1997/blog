@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      class LRU {
+        constructor(capacity) {
+          this.map = new Map()
+          this.capacity = capacity
+        }
+
+        get(key) {
+          if (!this.map.has(key)) {
+            return -1
+          }
+          let val = this.map.get(key)
+          this.map.delete(key)
+          this.map.set(key, val)
+          return val
+        }
+
+        put(key, val) {
+          if (this.map.has(key)) {
+            this.map.delete(key)
+          }
+          this.map.set(key, val)
+          // 容量超过了
+          if (this.map.size > this.capacity) {
+            // 删除第一个
+            this.map.delete(this.map.keys().next().value)
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

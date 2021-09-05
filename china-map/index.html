@@ -44,7 +44,8 @@
           this.setController()
           this.setRaycaster()
           this.animate()
-          this.loadMapData()
+          //this.loadMapData()
+          this.addFont()
           this.addHelper()
         }
 
@@ -134,6 +135,26 @@
           const material = new THREE.MeshBasicMaterial({ color: 0x50ff22 })
           this.cube = new THREE.Mesh(geometry, material)
           this.scene.add(this.cube)
+        }
+
+        addFont() {
+          const loader = new THREE.FontLoader()
+          loader.load('../json/alibaba.json', (font) => {
+            const geometry = new THREE.TextGeometry('我爱掘金', {
+              font: font,
+              size: 20,
+              height: 5,
+              curveSegments: 12,
+              bevelEnabled: false,
+              bevelThickness: 10,
+              bevelSize: 8,
+              bevelOffset: 0,
+              bevelSegments: 5,
+            })
+            const material = new THREE.MeshBasicMaterial({ color: 0x49ef4 })
+            const mesh = new THREE.Mesh(geometry, material)
+            this.scene.add(mesh)
+          })
         }
 
         addHelper() {

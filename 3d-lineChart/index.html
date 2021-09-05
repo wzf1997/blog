@@ -33,6 +33,28 @@
       class threeChart {
         constructor() {
           this.init()
+          this.addFont()
+        }
+
+        addFont() {
+          const loader = new THREE.FontLoader()
+
+          loader.load('./alibaba.json', (font) => {
+            const geometry = new THREE.TextGeometry('设计云', {
+              font: font,
+              size: 80,
+              height: 5,
+              curveSegments: 12,
+              bevelEnabled: true,
+              bevelThickness: 10,
+              bevelSize: 8,
+              bevelOffset: 0,
+              bevelSegments: 5,
+            })
+            const material = new THREE.MeshBasicMaterial({ color: 0x50ff22 })
+            const mesh = new THREE.Mesh(geometry, material)
+            this.scene.add(mesh)
+          })
         }
 
         init() {

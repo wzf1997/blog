@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      var lengthOfLongestSubstring = function (s) {
+        // 子串开始位置
+        let minIndex = 0
+        // 记录最大长度
+        let max = 0
+        // 每次从子串开始位置进行查找有没有重复字符串，也就是当前窗口位置控制在minIndex到i之间
+        for (let i = 0; i < s.length; i++) {
+          // 如果当前窗口有重复的字符，子串开始位置变成重复字符的下一个位置
+          let pos = s.indexOf(s[i], minIndex)
+          console.log(pos, s[i], minIndex)
+          if (pos < i) {
+            minIndex = pos + 1
+          } else {
+            // 如果没有重复，长度出现更新
+            max = Math.max(max, i - minIndex + 1)
+          }
+        }
+        return max
+      }
+      lengthOfLongestSubstring('abcabcbb')
+    </script>
+  </body>
+</html>

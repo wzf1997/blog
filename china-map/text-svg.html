@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="text" name="" id="input" />
+    <script src="https://cdn.jsdelivr.net/npm/opentype.js@latest/dist/opentype.min.js"></script>
+    <script>
+      async function make() {
+        const font = await opentype.load(
+          'https://backend-public-asset-alpha.oss-cn-shanghai.aliyuncs.com/resources/website/font/11c302dd8c50619e4131da5d645fb422.otf'
+        )
+        const map = new Map()
+        return function (text) {
+          // 防止重复添加
+          for (let i = 0; i < text.length - 1; i++) {
+            const parseFont = font.getPath(text[i], 0, 150, 72)
+            const char = text[i]
+            console.log(text[i], '999')
+            if (!map.has(char)) {
+              map.set(text[i], parseFont.commands)
+            }
+          }
+          return map
+        }
+      }
+
+      let val = document.getElementById('input')
+      let handler = make()
+      let map
+      val.addEventListener('input', (e) => {
+        handler
+          .then((fn) => {
+            return fn(e.target.value)
+          })
+          .then((res) => {
+            map = res
+            console.log(res)
+          })
+      })
+      let pointMap = new Map()
+      function svgs2Points() {
+        if (!map) {
+          return
+        }
+        for (let [key, value] of map.entires()) {
+          const points = []
+          value.forEach((item) => {
+            if (item.type === 'M') {
+              const { x, y } = item
+              points.push([x, y])
+            } else if (item.type === 'L') {
+              const { x, y } = item
+              points.push([x, y])
+            } else if (item.type === 'Q') {
+              // 二阶贝塞尔曲线
+            }
+          })
+        }
+      }
+    </script>
+  </body>
+</html>
