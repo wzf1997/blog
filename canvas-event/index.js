@@ -15,9 +15,10 @@ export class Canvas {
     this.ctx = this.canvas.getContext('2d')
     this.allShapes = []
     this.undoStack = []
+    
     this.redoStack = []
     this.shapePropsDiffMap = new Map()
-    this.canvas.addEventListener(move, this.handleEvent(move))
+    // this.canvas.addEventListener(move, this.handleEvent(move))
     this.canvas.addEventListener(click, this.handleEvent(click))
     this.canvas.addEventListener(keydown, (e) => {
       e.preventDefault()
@@ -36,6 +37,7 @@ export class Canvas {
     this.allShapes.forEach((shape) => {
       // 获取当前事件的所有监听者
       const listerns = shape.listenerMap.get(name)
+      console.log(event.isStopBubble ,'查看数据---')
       if (
         listerns &&
         shape.isPointInClosedRegion(event) &&

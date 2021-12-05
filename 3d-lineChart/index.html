@@ -39,7 +39,8 @@
         addFont() {
           const loader = new THREE.FontLoader()
 
-          loader.load('./alibaba.json', (font) => {
+          loader.load('https://cdn.poizon.com/node-common/5121fb603fef9b5ae54eefe08b2faba7.json', (font) => {
+            console.log(font)
             const geometry = new THREE.TextGeometry('设计云', {
               font: font,
               size: 80,

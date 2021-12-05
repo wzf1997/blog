@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+  <style>
+      html body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      canvas {
+        background: red;
+        outline: 0px;
+      }
+  </style>
+<body>
+    <canvas id="canvas" width="800" height="600" tabindex="0"></canvas>
+    <svg width="100%" height="100%" viewBox="0 0 400 400"
+     xmlns="http://www.w3.org/2000/svg">
+
+    <path d='M0,0 C8,33.90861 25.90861,16 48,16 C70.09139,16 88,33.90861 88,56 C88,78.09139 105.90861,92 128,92 C150.09139,92 160,72 160,56 C160,40 148,24 128,24 C108,24 96,40 96,56 C96,72 105.90861,92 128,92 C154,93 168,78 168,56 C168,33.90861 185.90861,16 208,16 C230.09139,16 248,33.90861 248,56 C248,78.09139 230.09139,96 208,96 L48,96 C25.90861,96 8,78.09139 8,56 Z'
+            fill="orange" stroke="black" stroke-width="3" />
+    </svg>
+    <script>
+
+        const path = 'M0,0 C8,33.90861 25.90861,16 48,16 C70.09139,16 88,33.90861 88,56 C88,78.09139 105.90861,92 128,92 C150.09139,92 160,72 160,56 C160,40 148,24 128,24 C108,24 96,40 96,56 C96,72 105.90861,92 128,92 C154,93 168,78 168,56 C168,33.90861 185.90861,16 208,16 C230.09139,16 248,33.90861 248,56 C248,78.09139 230.09139,96 208,96 L48,96 C25.90861,96 8,78.09139 8,56 Z';
+
+        const pathElement = document.createElementNS('http://www.w3.org/2000/svg',"path"); 
+        pathElement.setAttributeNS(null, 'd', path);
+        document.body.appendChild(pathElement)
+
+        const length = pathElement.getTotalLength();
+        const duration = 1000; // 动画总时长
+        const interval = length / duration;
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        let time = 0, step = 0; 
+         
+
+        function move(x, y) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.beginPath();
+            context.arc(x, y, 25, 0, Math.PI*2, true);
+            context.fillStyle = '#f0f';
+            context.fill();
+            context.closePath();
+        }
+        animate()
+
+        function  animate()  {
+            if(step >  length) {
+                step = 0;
+            }
+            const x = parseInt(pathElement.getPointAtLength(step).x);
+	        const y = parseInt(pathElement.getPointAtLength(step).y);
+            move(x,y)
+            step++
+            requestAnimationFrame(animate)
+        }
+    </script>
+</body>
+</html>

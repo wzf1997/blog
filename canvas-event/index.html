@@ -43,34 +43,46 @@
       })
       circle.on(click, (event) => {
         event.isStopBubble = true
-        console.log(event, 'circle')
+        console.log('我是圆形')
       })
       rect.on(click, (event) => {
-        console.log(event, 'rect')
+        console.log('我是矩形')
       })
+      // const polygon = new Polygon({
+      //   points: [1,2,3,,5].map(item => {
+      //     return  Point2d.random(800,600)
+      //   }), 
+      //   fillColor: 'blue'
+      // })
+      // polygon.on(click, (event) => {
+      //   // event.isStopBubble = true
+      //   console.log('我是多边形')
+      // })
       //   shape.on(click, (event) => {
       //     console.log(event, 'polygon')
       //   })
       const shapes = []
-      for (let i = 1; i <= 50; i++) {
-        const circle = new Circle({
-          center: Point2d.random(800, 600),
-          radius: i + 20,
-          fillColor:
-            'rgb( ' +
-            ((Math.random() * 255) >> 0) +
-            ',' +
-            ((Math.random() * 255) >> 0) +
-            ',' +
-            ((Math.random() * 255) >> 0) +
-            ' )',
-        })
-        shapes.push(circle)
-      }
+      // for (let i = 1; i <= 50; i++) {
+      //   const circle = new Circle({
+      //     center: Point2d.random(800, 600),
+      //     radius: i + 20,
+      //     fillColor:
+      //       'rgb( ' +
+      //       ((Math.random() * 255) >> 0) +
+      //       ',' +
+      //       ((Math.random() * 255) >> 0) +
+      //       ',' +
+      //       ((Math.random() * 255) >> 0) +
+      //       ' )',
+      //   })
+      //   shapes.push(circle)
+      // }
+      // canvas.add(polygon)
       canvas.add(circle)
-      console.log(shapes, '查看数据')
+      canvas.add(rect)
+      //console.log(shapes, '查看数据')
       //canvas.batchAdd([rect, shape])
-      canvas.batchAdd(shapes)
+      //canvas.batchAdd(shapes)
 
       // 局部改变圆的颜色
       document.getElementById('btn').addEventListener(click, () => {
