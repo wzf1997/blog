@@ -39,3 +39,5 @@ alt="公众号" style="zoom:50%;" />
 [three.js 实现一个可视化 3d 地图](https://github.com/wzf1997/blog/blob/main/china-map/index.html)
 
 [几个简单的小例子带你入门 webgl](https://github.com/wzf1997/blog/tree/main/webgl-drawTriangle)
+
+[three.js 实现圣诞节动画](https://github.com/wzf1997/blog/tree/main/3d-tree)
