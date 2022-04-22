@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script src="./three.js"></script>
+<script src="./control.js"></script>
+<canvas id="canvas" width="1000" height="1000"></canvas>
+<div id="tooltip"></div>
+<script type="module">
+    import { GLTFLoader } from './gltf.js'
+
+    class Template {
+
+        constructor(canvas, view) {
+            this.canvas = canvas
+            this.view = view
+            this.scene = new THREE.Scene()
+
+        }
+
+        //初始化场景
+        init() {
+            this.setCamera()
+            this.setRenderer()
+        }
+
+
+
+        // 设置渲染器
+        setRenderer() {
+            this.renderer = new THREE.WebGLRenderer({
+                canvas: this.canvas,
+            })
+            this.renderer.setPixelRatio(window.devicePixelRatio)
+            // 设置画布的大小
+            this.renderer.setSize(this.view.width, this.view.height)
+        }
+
+        // 新建透视相机
+        setCamera() {
+            // 第二参数就是 长度和宽度比 默认采用浏览器  返回以像素为单位的窗口的内部宽度和高度
+            this.camera = new THREE.PerspectiveCamera(75, this.view.width / this.view.height, 1, 3000)
+            this.camera.position.z = 200
+            this.scene.add(this.camera)
+        }
+
+        //渲染
+        render() {
+            if (this.renderer && this.camera) {
+                this.renderer.render(this.scene, this.camera)
+            }
+        }
+    }
+    class Scence extends Template {
+        constructor(canvas, view) {
+            super(canvas, view)
+            this.init()
+            this.updateBg()
+            this.count = 100
+            this.curveHandles = []
+            this.mixer = null;
+            this.clock = new THREE.Clock();
+
+
+            this.addLight()
+            this.loadchild()
+            this.addControl()
+            this.helper = new THREE.CameraHelper(this.camera);
+
+
+        }
+
+        updateBg() {
+            if (this.renderer) {
+                this.renderer.setClearColor('rgb(255,255,255)', 1.0)
+            }
+        }
+
+        addControl() {
+            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
+        }
+
+
+        // 新建透视相机
+        setCamera() {
+            // 第二参数就是 长度和宽度比 默认采用浏览器  返回以像素为单位的窗口的内部宽度和高度
+            this.camera = new THREE.PerspectiveCamera(75, this.view.width / this.view.height, 1, 1000)
+            this.camera.position.z = 150
+            this.camera.position.x = 30
+            this.camera.position.y = 20
+            this.camera.lookAt(this.scene.position)
+        }
+
+        addLight() {
+            // const light = new THREE.PointLight(0xffaa33)
+            // light.castShadow = true
+            // light.position.set(0, 20, 0)
+            // light.intensity = 0.5
+            // this.scene.add(light)
+            const light2 = new THREE.AmbientLight(0x222244)
+            light2.castShadow = true
+            light2.intensity = 3
+            this.scene.add(light2)
+        }
+
+
+        // 增加雾的效果
+        addFog() {
+            this.scene.fog = new THREE.FogExp2(0x000000, 0.0008)
+        }
+
+        // 加载gltf 模型
+        loadchild() {
+            const loader = new GLTFLoader().setPath('model/');
+            loader.load('scene.gltf', (gltf) => {
+                gltf.scene.scale.set(20, 20, 20)
+                console.error(gltf.animations, '查看动画')
+                this.mixer = new THREE.AnimationMixer(gltf.scene);
+                this.mixer.clipAction(gltf.animations[0]).play();
+                console.error(gltf.scene)
+                gltf.scene.traverse(child => {
+                    if (child.isMesh) {
+                        console.error(child, '2')
+                    }
+                })
+                this.scene.add(gltf.scene)
+            })
+        }
+
+
+
+        updateCamera(time) {
+            if (this.camera) {
+                this.camera.position.x = Math.sin(time * 0.0005) * 150
+                this.camera.position.z = 100 + Math.cos(time * 0.0005) * 150
+                this.camera.position.y = 30 + Math.cos(time * 0.0005) * 30
+                this.camera.lookAt(new THREE.Vector3(0, -20, 0))
+            }
+        }
+
+        render() {
+            super.render()
+            if (this.mixer) {
+                this.mixer.update(this.clock.getDelta())
+            }
+            this.controls.update()
+            this.helper.update()
+            requestAnimationFrame(this.render.bind(this))
+
+        }
+    }
+    let canvas = document.getElementById('canvas')
+    let scene = new Scence(canvas, {
+        width: window.innerWidth,
+        height: window.innerHeight
+    })
+    scene.render()
+
+</script>
+
+</html>

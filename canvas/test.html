@@ -1,12 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        margin-top: 10px;
+        margin-left: 181px;
+    }
+
+    canvas {
+        background-color: black;
+        margin: 0 auto;
+        /* perspective: 500; */
+        transform: rotateZ(90);
+
+    }
+</style>
+
 <body>
-    
+    <h1>端午节快乐</h1>
+    <canvas id='canvas' width="1000" height="1000"></canvas>
 </body>
+<script>
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext("2d");
+    // 焦距  和  整个画布的圆心
+    const fallLength = 200,
+        centerX = canvas.width / 2,
+        centerY = canvas.height / 2;
+
+    const visual = { x: 0, y: 0, z: 200 }
+    function get2d(dot) {
+        var scale = fallLength / (fallLength + dot.z);
+        var x = centerX + dot.x * scale;
+        var y = centerY + dot.y * scale;
+        return { x: x, y: y };
+    }
+
+    function three2D(dot) {
+        const { x, y, z } = dot
+        const x1 = x * visual.z / visual.z - z
+        const y1 = y * visual.z / visual.z - z
+        return { x: x1, y: y1 }
+    }
+
+    // 角度转化成弧度
+    const getRadianFromAngle = (angle) => (Math.PI / 180) * angle;
+    // 封装下cos  sin
+    const cos = (angle) => Math.cos(getRadianFromAngle(angle));
+    const sin = (angle) => Math.sin(getRadianFromAngle(angle));
+
+    function getStarPath({ ctx, x, y, R, r, rotate = 0 }) {
+        ctx.beginPath();
+        const horn = 6;
+        const angle = 360 / horn;
+        let point1;
+        let point2;
+        for (let i = 0; i < horn; i++) {
+
+            point1 = { x: R * cos(30 + i * angle - rotate) + x, y: 0, z: -1 * (-R * sin(30 + i * angle - rotate) + y) }
+            point2 = { x: r * cos(60 + i * angle - rotate) + x, y: 0, z: -1 * (-r * sin(60 + i * angle - rotate) + y) }
+            // const cv1 = three2D(point1)
+            // const cv2 = three2D(point2)
+            const cv1 = get2d(point1)
+            const cv2 = get2d(point2)
+            // ctx.lineTo(R * cos(30 + i * angle - rotate) + x, -R * sin(30 + i * angle - rotate) + y);
+            // ctx.lineTo(r * cos(60 + i * angle - rotate) + x, -r * sin(60 + i * angle - rotate) + y);
+            console.error(cv1, cv2)
+            ctx.lineTo(cv1.x, cv1.y)
+            ctx.lineTo(cv2.x, cv2.y)
+        }
+        ctx.closePath();
+    }
+    ctx.save()
+    // 1.设置路径
+    getStarPath({ ctx, x: 500, y: 500, R: 100, r: 50 });
+    // 2.设置状态
+    ctx.lineWidth = "3";
+    ctx.strokeStyle = "white";
+    // 3.绘制
+    ctx.stroke();
+    ctx.restore();
+
+    // getStarPath({ ctx, x: 500, y: 500, R: 200, r: 100 });
+    // // 2.设置状态
+    // ctx.lineWidth = "3";
+    // ctx.strokeStyle = "white";
+    // // 3.绘制
+    // ctx.stroke();
+
+
+</script>
+
 </html>

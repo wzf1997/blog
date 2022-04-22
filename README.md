@@ -9,6 +9,12 @@
 alt="公众号" style="zoom:50%;" />
 </div>
 
+# 个人博客
+
+![image-20220422232931095](https://ztifly.oss-cn-hangzhou.aliyuncs.com/image-20220422232931095.png)
+
+[个人博客跳转链接](https://wzf1997.github.io/learn-visualization/)
+
 # js
 
 1.  [bind](https://github.com/wzf1997/blog/blob/main/es6/Mybind.js)

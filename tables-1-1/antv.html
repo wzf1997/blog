@@ -14,7 +14,6 @@
     <script>
 
         // 柱状图
-
         const data = [
             { genre: 'Sports', sold: 275 },
             { genre: 'Strategy', sold: 115 },
@@ -34,8 +33,6 @@
         chart.scale('sold', {
             alias: '数量',
         });
-
-
         // Step 3: 创建图形语法，绘制柱状图 
         chart.interval().position('genre*sold');
 
