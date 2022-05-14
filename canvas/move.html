@@ -1,257 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <style>
-      canvas {
-        background: aqua;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <style>
+    canvas {
+      background: aqua;
+    }
+
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas" width="1800" height="800"></canvas>
+  <script>
+    let current = 0
+    const pointMap = []
+    class Point2d {
+      constructor(x, y) {
+        this.x = x || 0
+        this.y = y || 0
+        this.id = ++current
       }
-      * {
-        margin: 0px;
-        padding: 0px;
-      }
-    </style>
-  </head>
-  <body>
-    <canvas id="canvas" width="1800" height="800"></canvas>
-    <script>
-      let current = 0
-      const pointMap = []
-      class Point2d {
-        constructor(x, y) {
-          this.x = x || 0
-          this.y = y || 0
-          this.id = ++current
-        }
-        clone() {
-          return new Point2d(this.x, this.y)
-        }
-
-        equal(v) {
-          return this.x === v.x && this.y === v.y
-        }
-
-        add2Map() {
-          pointMap.push(this)
-          return this
-        }
-
-        add(v) {
-          this.x += v.x
-          this.y += v.y
-          return this
-        }
-
-        abs() {
-          return [Math.abs(this.x), Math.abs(this.y)]
-        }
-
-        sub(v) {
-          this.x -= v.x
-          this.y -= v.y
-          return this
-        }
-
-        equal(v) {
-          return this.x === v.x && this.y === v.y
-        }
-
-        rotate(center, angle) {
-          const c = Math.cos(angle),
-            s = Math.sin(angle)
-          const x = this.x - center.x
-          const y = this.y - center.y
-          this.x = x * c - y * s + center.x
-          this.y = x * s + y * c + center.y
-          return this
-        }
-
-        distance(p) {
-          const [x, y] = this.clone().sub(p).abs()
-          return x * x + y * y
-        }
-
-        distanceSq(p) {
-          const [x, y] = this.clone().sub(p).abs()
-          return Math.sqrt(x * x + y * y)
-        }
-
-        random(width, height) {
-          this.x = Math.random() * width
-          this.y = Math.random() * height
-          return this
-        }
-
-        cross(v) {
-          return this.x * v.y - this.y * v.x
-        }
+      clone() {
+        return new Point2d(this.x, this.y)
       }
 
-      const canvas = document.getElementById('canvas')
-      const ctx = canvas.getContext('2d')
-
-      let p1 = new Point2d()
-      let p2 = new Point2d()
-      let start
-      let end
-      // 当前画布上是否有
-      let isSelect = false
-      // 是否移动的开关
-      let isMove = true
-      // 移动的是哪一个点
-      const movePoint = []
-      // 所有的线段
-      let segs
-
-      // 初始化一个任意多边形
-      function init(n = 5, x = 200) {
-        const center = new Point2d(x, 400)
-        // const radius =  50;
-        const end = new Point2d(x + 50, 400).add2Map()
-        const points = getAnyPolygonPoints(center, end, n)
-        segs = points2Segs(points)
-        console.log(segs)
-        drawAnyPolygon(points)
+      equal(v) {
+        return this.x === v.x && this.y === v.y
       }
-      init()
 
-      function points2Segs(points) {
-        const start = points[0]
-        points.push(start)
-        const segs = []
-        points.forEach((point, index) => {
-          if (index !== points.length - 1) {
-            segs.push([point, points[index + 1]])
+      add2Map() {
+        pointMap.push(this)
+        return this
+      }
+
+      add(v) {
+        this.x += v.x
+        this.y += v.y
+        return this
+      }
+
+      addL() {
+
+      }
+
+      abs() {
+        return [Math.abs(this.x), Math.abs(this.y)]
+      }
+
+      sub(v) {
+        this.x -= v.x
+        this.y -= v.y
+        return this
+      }
+
+      equal(v) {
+        return this.x === v.x && this.y === v.y
+      }
+
+      rotate(center, angle) {
+        const c = Math.cos(angle),
+          s = Math.sin(angle)
+        const x = this.x - center.x
+        const y = this.y - center.y
+        this.x = x * c - y * s + center.x
+        this.y = x * s + y * c + center.y
+        return this
+      }
+
+      distance(p) {
+        const [x, y] = this.clone().sub(p).abs()
+        return x * x + y * y
+      }
+
+      distanceSq(p) {
+        const [x, y] = this.clone().sub(p).abs()
+        return Math.sqrt(x * x + y * y)
+      }
+
+      random(width, height) {
+        this.x = Math.random() * width
+        this.y = Math.random() * height
+        return this
+      }
+
+      cross(v) {
+        return this.x * v.y - this.y * v.x
+      }
+    }
+
+    const canvas = document.getElementById('canvas')
+    const ctx = canvas.getContext('2d')
+
+    let p1 = new Point2d()
+    let p2 = new Point2d()
+    let start
+    let end
+    // 当前画布上是否有
+    let isSelect = false
+    // 是否移动的开关
+    let isMove = true
+    // 移动的是哪一个点
+    const movePoint = []
+    // 所有的线段
+    let segs
+
+    // 初始化一个任意多边形
+    function init(n = 5, x = 200) {
+      const center = new Point2d(x, 400)
+      // const radius =  50;
+      const end = new Point2d(x + 50, 400).add2Map()
+      const points = getAnyPolygonPoints(center, end, n)
+      segs = points2Segs(points)
+      console.log(segs)
+      drawAnyPolygon(points)
+    }
+    init()
+
+    function points2Segs(points) {
+      const start = points[0]
+      points.push(start)
+      const segs = []
+      points.forEach((point, index) => {
+        if (index !== points.length - 1) {
+          segs.push([point, points[index + 1]])
+        }
+      })
+      return segs
+    }
+
+    function pointDistanceToLine(target, line) {
+      const [start, end] = line
+      const vec1 = start.clone().sub(target)
+      const vec2 = end.clone().sub(target)
+      return vec1.clone().cross(vec2) / start.clone().distanceSq(target)
+    }
+    //   init(10, 400)
+    //   init(20, 600)
+    //   init(50, 800)
+
+    function getAnyPolygonPoints(start, end, n = 3) {
+      const angle = (Math.PI * 2) / n
+      const points = [end]
+      for (let i = 1; i < n; i++) {
+        points.push(
+          end
+            .clone()
+            .rotate(start.clone(), angle * i)
+            .add2Map()
+        )
+      }
+      return points
+    }
+
+    //画出任意多边形 满足顺时针方向
+    function drawAnyPolygon(points) {
+      if (!Array.isArray(points)) {
+        return
+      }
+      ctx.strokeStyle = 'black'
+      ctx.setLineDash([])
+      ctx.beginPath()
+      // 存在移动的点
+      if (movePoint.length > 0) {
+        const moveVec = end.clone().sub(start)
+        points = points.map((item) => {
+          if (item.equal(movePoint[0]) || item.equal(movePoint[1])) {
+            return item.clone().add(moveVec)
           }
+          return item.clone()
         })
-        return segs
       }
-
-      function pointDistanceToLine(target, line) {
-        const [start, end] = line
-        const vec1 = start.clone().sub(target)
-        const vec2 = end.clone().sub(target)
-        return vec1.clone().cross(vec2) / start.clone().distanceSq(target)
-      }
-      //   init(10, 400)
-      //   init(20, 600)
-      //   init(50, 800)
-
-      function getAnyPolygonPoints(start, end, n = 3) {
-        const angle = (Math.PI * 2) / n
-        const points = [end]
-        for (let i = 1; i < n; i++) {
-          points.push(
-            end
-              .clone()
-              .rotate(start.clone(), angle * i)
-              .add2Map()
-          )
-        }
-        return points
-      }
-
-      //画出任意多边形 满足顺时针方向
-      function drawAnyPolygon(points) {
-        if (!Array.isArray(points)) {
-          return
-        }
-        ctx.strokeStyle = 'black'
-        ctx.setLineDash([])
-        ctx.beginPath()
-        // 存在移动的点
-        if (movePoint.length > 0) {
-          const moveVec = end.clone().sub(start)
-          points = points.map((item) => {
-            if (item.equal(movePoint[0]) || item.equal(movePoint[1])) {
-              return item.clone().add(moveVec)
-            }
-            return item.clone()
-          })
-        }
-        ctx.moveTo(points[0].x, points[0].y)
-        points.slice(1).forEach((item) => {
-          ctx.lineTo(item.x, item.y)
-        })
-        ctx.closePath()
-        ctx.stroke()
-      }
-
-      // 清除画布
-      function clearRect() {
-        ctx.clearRect(0, 0, 1800, 800)
-        pointMap.length = 0
-      }
-      // 找出最近的一个点
-      function calcClosestPoint() {
-        const minMap = []
-        for (let value of pointMap) {
-          const dis = value.distance(start.clone())
-          minMap.push({ ...value, dis })
-        }
-        // 找出最近的的一个点
-        const sort = minMap.sort((a, b) => a.dis - b.dis)
-        const { x, y } = sort[0]
-        return new Point2d(x, y)
-      }
-
-      // 找出最近的线
-      function calcClosestLine() {
-        let minMap = []
-        segs.forEach((line) => {
-          const dis = pointDistanceToLine(start, line)
-          minMap.push({
-            dis,
-            line,
-          })
-        })
-        minMap = minMap.sort((a, b) => a.dis - b.dis)
-        movePoint.push(...minMap[0].line)
-      }
-
-      // 找出最近的面
-      function calcClosestMesh() {}
-
-      function drawDashLine(start, end) {
-        if (!start || !end) {
-          return
-        }
-        ctx.strokeStyle = 'red'
-        ctx.setLineDash([5, 10])
-        ctx.beginPath()
-        ctx.moveTo(start.x, start.y)
-        ctx.lineTo(end.x, end.y)
-        ctx.closePath()
-        ctx.stroke()
-      }
-      canvas.addEventListener('mousemove', (e) => {
-        if (!isMove) {
-          return
-        }
-        const x = e.clientX
-        const y = e.clientY
-        clearRect()
-        end = new Point2d(x, y)
-        drawDashLine(start, end)
-        init()
+      ctx.moveTo(points[0].x, points[0].y)
+      points.slice(1).forEach((item) => {
+        ctx.lineTo(item.x, item.y)
       })
-      canvas.addEventListener('click', (e) => {
-        if (e.altKey) {
-          isMove = false
-          return
-        }
-        isMove = !isMove
-        const x = e.clientX
-        const y = e.clientY
-        start = new Point2d(x, y)
-        movePoint.length = 0
-        calcClosestLine()
-        // movePoint.push(calcClosestPoint())
-        isSelect = true
+      ctx.closePath()
+      ctx.stroke()
+    }
+
+    // 清除画布
+    function clearRect() {
+      ctx.clearRect(0, 0, 1800, 800)
+      pointMap.length = 0
+    }
+    // 找出最近的一个点
+    function calcClosestPoint() {
+      const minMap = []
+      for (let value of pointMap) {
+        const dis = value.distance(start.clone())
+        minMap.push({ ...value, dis })
+      }
+      // 找出最近的的一个点
+      const sort = minMap.sort((a, b) => a.dis - b.dis)
+      const { x, y } = sort[0]
+      return new Point2d(x, y)
+    }
+
+    // 找出最近的线
+    function calcClosestLine() {
+      let minMap = []
+      segs.forEach((line) => {
+        const dis = pointDistanceToLine(start, line)
+        minMap.push({
+          dis,
+          line,
+        })
       })
-    </script>
-  </body>
+      minMap = minMap.sort((a, b) => a.dis - b.dis)
+      movePoint.push(...minMap[0].line)
+    }
+
+    // 找出最近的面
+    function calcClosestMesh() { }
+
+    function drawDashLine(start, end) {
+      if (!start || !end) {
+        return
+      }
+      ctx.strokeStyle = 'red'
+      ctx.setLineDash([5, 10])
+      ctx.beginPath()
+      ctx.moveTo(start.x, start.y)
+      ctx.lineTo(end.x, end.y)
+      ctx.closePath()
+      ctx.stroke()
+    }
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isMove) {
+        return
+      }
+      const x = e.clientX
+      const y = e.clientY
+      clearRect()
+      end = new Point2d(x, y)
+      drawDashLine(start, end)
+      init()
+    })
+    canvas.addEventListener('click', (e) => {
+      if (e.altKey) {
+        isMove = false
+        return
+      }
+      isMove = !isMove
+      const x = e.clientX
+      const y = e.clientY
+      start = new Point2d(x, y)
+      movePoint.length = 0
+      calcClosestLine()
+      // movePoint.push(calcClosestPoint())
+      isSelect = true
+    })
+  </script>
+</body>
+
 </html>
